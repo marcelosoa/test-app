@@ -1,14 +1,42 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { ButtonComponent } from '../../components/button/button';
+import { InputComponent } from '../../components/input/input';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { AccountModel } from '../../domain/models/account.model';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { Authentication } from '../../config/firebase/firebaseConfig';
 
-import EditScreenInfo from '../../components/EditScreenInfo';
-import { Text, View } from '../../components/Themed';
 
 export default function TabOneScreen() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [account, setAccount] = useState<AccountModel | null>(null)
+
+  const handleLogin = async (account: AccountModel) => {
+    try {
+      await signInWithEmailAndPassword(Authentication, account.email, account.password)
+      setAccount(account)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <InputComponent
+        placeholder='Alo'
+        startIcon={<MaterialCommunityIcons name='home' color={'#fff'} size={24} />}
+        onChangeText={(email) => setEmail(email)}
+      />
+      <InputComponent
+        placeholder='Alo'
+        endIcon={<MaterialCommunityIcons name='home' color={'#fff'} size={24} />}
+        onChangeText={(password) => setPassword(password)}
+      />
+      <ButtonComponent onPress={() => handleLogin({ email, password })}>
+        Entrar
+      </ButtonComponent>
     </View>
   );
 }
